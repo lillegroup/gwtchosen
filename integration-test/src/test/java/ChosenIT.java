@@ -32,6 +32,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import com.arcbees.chosen.integrationtest.client.TestCase;
 import com.arcbees.chosen.integrationtest.client.domain.CarBrand;
 import com.arcbees.chosen.integrationtest.client.testcases.AllowSingleDeselect;
+import com.arcbees.chosen.integrationtest.client.testcases.AllowSingleDeselectNullNonEmpty;
 import com.arcbees.chosen.integrationtest.client.testcases.ChooseOption;
 import com.arcbees.chosen.integrationtest.client.testcases.DisableSearchThreshold;
 import com.arcbees.chosen.integrationtest.client.testcases.EnabledDisabled;
@@ -128,6 +129,22 @@ public class ChosenIT {
     public void allowSingleDeselect() {
         // Given
         loadTestCase(new AllowSingleDeselect());
+        clickOption(CADILLAC, RENDERER);
+
+        // When
+        singleDeselect();
+
+        // Then
+        assertThat(getSelectedOptionText()).isEqualTo(AllowSingleDeselect.PLACEHOLDER);
+    }
+
+    /**
+     * Goal: ensure allowSingleDeselect is working properly when a null renderer isn't an empty string.
+     */
+    @Test
+    public void allowSingleDeselect_nullNonEmpty() {
+        // Given
+        loadTestCase(new AllowSingleDeselectNullNonEmpty());
         clickOption(CADILLAC, RENDERER);
 
         // When

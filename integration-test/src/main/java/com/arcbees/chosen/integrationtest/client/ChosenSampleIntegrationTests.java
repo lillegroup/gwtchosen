@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.arcbees.chosen.integrationtest.client.testcases.AllowSingleDeselect;
+import com.arcbees.chosen.integrationtest.client.testcases.AllowSingleDeselectNullNonEmpty;
 import com.arcbees.chosen.integrationtest.client.testcases.ChooseOption;
 import com.arcbees.chosen.integrationtest.client.testcases.DisableSearchThreshold;
 import com.arcbees.chosen.integrationtest.client.testcases.EnabledDisabled;
@@ -52,6 +53,7 @@ public class ChosenSampleIntegrationTests implements EntryPoint, ValueChangeHand
         registerTestCase(new HideEmptyValues());
         registerTestCase(new ShowNonEmptyValues());
         registerTestCase(new AllowSingleDeselect());
+        registerTestCase(new AllowSingleDeselectNullNonEmpty());
         registerTestCase(new TabNavigation());
         registerTestCase(new EnabledDisabled());
         registerTestCase(new Above());

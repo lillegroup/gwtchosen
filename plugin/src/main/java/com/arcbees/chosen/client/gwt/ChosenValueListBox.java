@@ -152,7 +152,12 @@ public class ChosenValueListBox<T> extends BaseChosenValueListBox<T> implements 
 
     @Override
     protected void addItemToChosenListBox(T value) {
-        getChosenListBox().addItem(renderer.render(value));
+        if (value == null) {
+            // Treat null value as empty so that ChosenImpl can do a allowSingleDeselect
+            getChosenListBox().addItem(renderer.render(value), "");
+        } else {
+            getChosenListBox().addItem(renderer.render(value));
+        }
     }
 
     private void setValue(T newValue, boolean fireEvents, boolean update) {

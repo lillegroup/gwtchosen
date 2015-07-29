@@ -406,6 +406,7 @@ public class ChosenImpl {
         if (eventBus != null) {
             updateEventHandlerRegistration =
                     eventBus.addHandler(UpdatedEvent.getType(), new UpdatedEvent.UpdatedHandler() {
+                        @Override
                         public void onUpdated(UpdatedEvent event) {
                             update();
                         }
@@ -514,6 +515,7 @@ public class ChosenImpl {
         searchContainer.before(ChozenTemplate.templates.choice(choiceId, css.searchChoice(), html,
                 css.searchChoiceClose(), "" + option.getArrayIndex(), option.getValue(), css.iconCross()).asString());
         $('#' + choiceId).find("a").click(new Function() {
+            @Override
             public boolean f(final Event e) {
                 choiceDestroyLinkClick(e);
                 return false;
@@ -663,6 +665,7 @@ public class ChosenImpl {
         if (!mouseOnContainer) {
             activeField = false;
             Scheduler.get().scheduleFixedDelay(new RepeatingCommand() {
+                @Override
                 public boolean execute() {
                     blurTest();
                     return false;
@@ -675,6 +678,7 @@ public class ChosenImpl {
     private boolean inputFocus(final Event e) {
         if (!activeField) {
             Scheduler.get().scheduleFixedDelay(new RepeatingCommand() {
+                @Override
                 public boolean execute() {
                     containerMouseDown(e);
                     return false;
@@ -1445,7 +1449,7 @@ public class ChosenImpl {
         NodeList<OptionElement> optionsList = selectElement.getOptions();
         allowSingleDeselect =
                 options.isAllowSingleDeselect() && optionsList.getLength() > 0
-                        && "".equals(optionsList.getItem(0).getText());
+                        && "".equals(optionsList.getItem(0).getValue());
 
         choices = 0;
 
