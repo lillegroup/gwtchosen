@@ -1027,9 +1027,6 @@ public class ChosenImpl {
                 choiceBuild(item);
             } else {
                 selectedItem.find("span").text(item.getText());
-                if (allowSingleDeselect) {
-                    singleDeselectControlBuild();
-                }
             }
 
             if (!e.getMetaKey() || !isMultiple) {
@@ -1046,6 +1043,10 @@ public class ChosenImpl {
             }
 
             selectedValues.add(newValue);
+
+            if (!isMultiple && allowSingleDeselect) {
+                singleDeselectControlBuild();
+            }
 
             if (isMultiple || oldValue == null || !oldValue.equals($selectElement.val())) {
                 fireEvent(new ChosenChangeEvent(newValue, position, this));
@@ -1580,7 +1581,8 @@ public class ChosenImpl {
     }
 
     private void singleDeselectControlBuild() {
-        if (allowSingleDeselect && selectedItem.find("abbr").isEmpty()) {
+        if (allowSingleDeselect && selectedItem.find("abbr").isEmpty()
+                && getCurrentValue() != null && !"".equals(getCurrentValue())) {
             selectedItem.find("span").first().after(
                     "<abbr class=\"" + css.searchChoiceClose() + " " + css.iconCross() + "\"></abbr>");
         }
