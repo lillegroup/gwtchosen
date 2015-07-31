@@ -141,7 +141,7 @@ public class ChosenIT {
     }
 
     /**
-     * Goal: ensure allowSingleDeselect shows the X/cross when there is a value
+     * Goal: ensure allowSingleDeselect shows the X/cross when there is a value.
      */
     @Test
     public void allowSingleDeselect_visibleOnSelection() {
