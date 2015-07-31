@@ -75,6 +75,7 @@ import static com.arcbees.chosen.integrationtest.client.domain.DefaultCarRendere
 public class ChosenIT {
     private static final String ROOT = "http://localhost:" + System.getProperty("testPort");
     private static final int TIME_OUT_IN_SECONDS = 20;
+    private static final String CHOSEN_XPATH = "//div[@id='chozen_container__0_chzn']";
     private final WebDriver webDriver = new ChromeDriver();
 
     @Test
@@ -136,6 +137,22 @@ public class ChosenIT {
 
         // Then
         assertThat(getSelectedOptionText()).isEqualTo(AllowSingleDeselect.PLACEHOLDER);
+        assertThat(getChosen().findElements(By.tagName("abbr"))).isEmpty();
+    }
+
+    /**
+     * Goal: ensure allowSingleDeselect shows the X/cross when there is a value
+     */
+    @Test
+    public void allowSingleDeselect_visibleOnSelection() {
+        // Given
+        loadTestCase(new AllowSingleDeselect());
+
+        // When
+        clickOption(CADILLAC, RENDERER);
+
+        // Then
+        assertThat(getChosen().findElements(By.tagName("abbr"))).isNotEmpty();
     }
 
     /**
@@ -563,23 +580,39 @@ public class ChosenIT {
         if (isMultipleChosenComponent()) {
             btn = getInput();
         } else { // single
-            String xpath = "//div[@id='chozen_container__0_chzn']";
-            btn = webDriverWait().until(elementToBeClickable(By.xpath(xpath)));
+            btn = webDriverWait().until(elementToBeClickable(By.xpath(CHOSEN_XPATH)));
         }
         btn.click();
     }
 
-    private String getSelectedOptionText() {
-        List<String> selectedOptions = getSelectedOptionTexts();
+    private WebElement getChosen() {
+        return webDriverWait().until(presenceOfElementLocated(By.xpath(CHOSEN_XPATH)));
+    }
 
-        return selectedOptions.isEmpty() ? null : selectedOptions.get(0);
+    private List<WebElement> getSelectedOptions() {
+        String xpath = CHOSEN_XPATH + "//span";
+
+        List<WebElement> options = webDriverWait().until(presenceOfAllElementsLocatedBy(By.xpath(xpath)));
+        return Lists.transform(options, new Function<WebElement, WebElement>() {
+            @Override
+            public WebElement apply(WebElement element) {
+                return element;
+            }
+        });
+    }
+
+    private WebElement getSelectedOption() {
+        List<WebElement> selectedOption = getSelectedOptions();
+
+        return selectedOption.isEmpty() ? null : selectedOption.get(0);
+    }
+
+    private String getSelectedOptionText() {
+        return getSelectedOption().getText();
     }
 
     private List<String> getSelectedOptionTexts() {
-        String xpath = "//div[@id='chozen_container__0_chzn']//span";
-
-        List<WebElement> options = webDriverWait().until(presenceOfAllElementsLocatedBy(By.xpath(xpath)));
-        return Lists.transform(options, new Function<WebElement, String>() {
+        return Lists.transform(getSelectedOptions(), new Function<WebElement, String>() {
             @Override
             public String apply(WebElement element) {
                 return element.getText();
@@ -588,7 +621,7 @@ public class ChosenIT {
     }
 
     private WebElement getInput() {
-        String xpath = "//div[@id='chozen_container__0_chzn']//input[@type='text']";
+        String xpath = CHOSEN_XPATH + "//input[@type='text']";
 
         return webDriverWait().until(presenceOfElementLocated(By.xpath(xpath)));
     }
