@@ -1108,14 +1108,15 @@ public class ChosenImpl {
                         choiceBuild(optionItem);
                     } else {
                         selectedItem.removeClass(css.chznDefault()).find("span").text(optionItem.getText());
-                        if (allowSingleDeselect) {
-                            singleDeselectControlBuild();
-                        }
 
                         selectedValues.clear();
                     }
 
                     selectedValues.add(optionItem.getValue());
+
+                    if (!isMultiple && allowSingleDeselect) {
+                        singleDeselectControlBuild();
+                    }
                 }
             }
         }
