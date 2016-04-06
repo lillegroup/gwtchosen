@@ -204,7 +204,6 @@ public class ChosenImpl {
     private GQuery $selectElement;
     private Function activateAction;
     private boolean activeField;
-    private boolean allowSingleDeselect;
     private int backstrokeLength;
     private int choices;
     private Function clickTestAction;
@@ -237,6 +236,7 @@ public class ChosenImpl {
     private GQuery selectedItem;
     private HandlerRegistration updateEventHandlerRegistration;
     private ResultsFilter resultsFilter;
+    private Boolean showCross = false;
 
     public GQuery getContainer() {
         return container;
@@ -1044,7 +1044,7 @@ public class ChosenImpl {
 
             selectedValues.add(newValue);
 
-            if (!isMultiple && allowSingleDeselect) {
+            if (!isMultiple) {
                 singleDeselectControlBuild();
             }
 
@@ -1054,6 +1054,11 @@ public class ChosenImpl {
 
             searchFieldScale();
         }
+    }
+
+    private boolean isAllowSingleDeselect() {
+        NodeList<OptionElement> optionsList = selectElement.getOptions();
+        return options.isAllowSingleDeselect() && optionsList.getLength() > 0 && showCross;
     }
 
     private void resultsBuild(boolean init) {
@@ -1075,7 +1080,14 @@ public class ChosenImpl {
         rebuildResultItems(init);
     }
 
+    private SafeHtml createEmptyOption() {
+        SafeHtmlBuilder builder = new SafeHtmlBuilder();
+        builder.append(fromTrustedString("<option value=''></option>"));
+        return builder.toSafeHtml();
+    }
+
     private void rebuildResultItems(boolean init) {
+        showCross = false;
         SafeHtmlBuilder content = new SafeHtmlBuilder();
         SafeHtmlBuilder optionsHtml = new SafeHtmlBuilder();
 
@@ -1091,6 +1103,8 @@ public class ChosenImpl {
                 OptionItem optionItem = (OptionItem) item;
 
                 if (optionItem.isEmpty()) {
+                    showCross = true;
+                    optionsHtml.append(createEmptyOption());
                     continue;
                 }
 
@@ -1114,7 +1128,7 @@ public class ChosenImpl {
 
                     selectedValues.add(optionItem.getValue());
 
-                    if (!isMultiple && allowSingleDeselect) {
+                    if (!isMultiple) {
                         singleDeselectControlBuild();
                     }
                 }
@@ -1449,9 +1463,6 @@ public class ChosenImpl {
         resultsShowing = false;
 
         NodeList<OptionElement> optionsList = selectElement.getOptions();
-        allowSingleDeselect =
-                options.isAllowSingleDeselect() && optionsList.getLength() > 0
-                        && "".equals(optionsList.getItem(0).getValue());
 
         choices = 0;
 
@@ -1582,7 +1593,7 @@ public class ChosenImpl {
     }
 
     private void singleDeselectControlBuild() {
-        if (allowSingleDeselect && selectedItem.find("abbr").isEmpty()
+        if (isAllowSingleDeselect() && selectedItem.find("abbr").isEmpty()
                 && getCurrentValue() != null && !"".equals(getCurrentValue())) {
             selectedItem.find("span").first().after(
                     "<abbr class=\"" + css.searchChoiceClose() + " " + css.iconCross() + "\"></abbr>");
