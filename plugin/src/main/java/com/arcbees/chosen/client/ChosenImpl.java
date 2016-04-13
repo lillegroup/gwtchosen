@@ -84,7 +84,6 @@ public abstract class ChosenImpl {
     private static int idCounter;
 
     protected boolean activeField;
-    protected boolean allowSingleDeselect;
     // TODO
     protected int choices;
     protected Function clickTestAction;
@@ -114,6 +113,8 @@ public abstract class ChosenImpl {
     private GQuery selectedItem;
     private HandlerRegistration updateEventHandlerRegistration;
     private ResultsFilter resultsFilter;
+    private Boolean showCross = false;
+
 
     public GQuery getContainer() {
         return container;
@@ -570,7 +571,7 @@ public abstract class ChosenImpl {
 
             selectedValues.add(newValue);
 
-            if (!isMultiple() && allowSingleDeselect) {
+            if (!isMultiple() && isAllowSingleDeselect()) {
                 singleDeselectControlBuild();
             }
 
@@ -1078,6 +1079,7 @@ public abstract class ChosenImpl {
     }
 
     private void rebuildResultItems(boolean init) {
+        showCross = false;
         if (selectedItem != null) {
             selectedItem.toggleClass(css.chznDefault(), selectedValues.isEmpty());
         }
@@ -1097,6 +1099,7 @@ public abstract class ChosenImpl {
                 OptionItem optionItem = (OptionItem) item;
 
                 if (optionItem.isEmpty()) {
+                    showCross = true;
                     optionsHtml.append(createEmptyOption());
                     continue;
                 }
@@ -1114,6 +1117,9 @@ public abstract class ChosenImpl {
                     addChoice(optionItem);
 
                     selectedValues.add(optionItem.getValue());
+                }
+                if (!isMultiple()) {
+                    singleDeselectControlBuild();
                 }
             }
         }
@@ -1283,6 +1289,11 @@ public abstract class ChosenImpl {
         }
     }
 
+    private boolean isAllowSingleDeselect() {
+        NodeList<OptionElement> optionsList = selectElement.getOptions();
+        return options.isAllowSingleDeselect() && optionsList.getLength() > 0 && showCross;
+    }
+
     private void setDefaultValues() {
         clickTestAction = new Function() {
             @Override
@@ -1296,9 +1307,6 @@ public abstract class ChosenImpl {
         resultsShowing = false;
 
         NodeList<OptionElement> optionsList = selectElement.getOptions();
-        allowSingleDeselect =
-                options.isAllowSingleDeselect() && optionsList.getLength() > 0
-                        && "".equals(optionsList.getItem(0).getValue());
 
         if (options.getResources() != null) {
             css = options.getResources().css();
@@ -1322,11 +1330,6 @@ public abstract class ChosenImpl {
         }
     }
 
-    private boolean isAllowSingleDeselect() {
-        NodeList<OptionElement> optionsList = selectElement.getOptions();
-        return options.isAllowSingleDeselect() && optionsList.getLength() > 0
-                && "".equals(optionsList.getItem(0).getText());
-    }
 
     private void setTabIndex() {
         String tabIndexProperty = $selectElement.attr(TABINDEX_PROPERTY);
@@ -1401,7 +1404,7 @@ public abstract class ChosenImpl {
     }
 
     private void singleDeselectControlBuild() {
-        if (allowSingleDeselect && selectedItem.find("abbr").isEmpty()
+        if (isAllowSingleDeselect() && selectedItem.find("abbr").isEmpty()
                 && getCurrentValue() != null && !"".equals(getCurrentValue())) {
             selectedItem.find("span").first().after(
                     "<abbr class=\"" + css.searchChoiceClose() + " " + css.iconCross() + "\"></abbr>");
